@@ -1,11 +1,14 @@
 export default class Card {
 
-    drag(){
-        const elements = document.getElementsByClassName('card');
-        const cards = Array.from(elements);
-        console.log(cards)
+    constructor() {
+        this.cards = Array.from(document.getElementsByClassName('card'));
+        this.drag();
+        this.mouseOver();
+        this.mouseOut();
+    }
 
-        cards.forEach(card => {
+    drag(){
+        this.cards.forEach(card => {
 
             // отслеживаем нажатие
             card.onmousedown = function(e) {
@@ -40,14 +43,28 @@ export default class Card {
                 card.ondragstart = function() {
                     return false;
                 };
-
-
             }
+        });
+    }
 
-            
+    mouseOver() {
+        this.cards.forEach(card => {
+            card.addEventListener("mouseover", (event)=> {
+                event.preventDefault();
+                card.children[0].children[1].classList.remove('hidden');
+            });
+        });
+    }
 
-        
-            
+    mouseOut() {
+        this.cards.forEach(card => {
+            card.addEventListener("mouseout", (event)=> {
+                event.preventDefault();
+                const cl = card.children[0].children[1];
+                if (!cl.classList.contains('hidden')) {
+                    cl.classList.add('hidden');
+                }
+            });
         });
     }
 }

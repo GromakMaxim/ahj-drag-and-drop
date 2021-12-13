@@ -53,12 +53,12 @@
     display: flex;
     justify-content: space-between;
     flex-direction: row;
-    margin-top: 5px;
+    margin-top: 10px;
     padding-left: 5px;
     padding-right: 5px;
 }
 
-.like, .comment {
+.like, .comment, .delete {
     display: flex;
     width: 25px;
     height: 25px;
@@ -70,4 +70,12 @@
 
 .comment {
     background-image: url(../pics/comment.png);
+}
+
+.delete {
+    background-image: url(../pics/delete.png);
+}
+
+.hidden {
+    display: none;
 }
