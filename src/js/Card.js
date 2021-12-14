@@ -23,7 +23,6 @@ export default class Card {
                 moveAt(e);
 
                 let curColumn = card.parentNode;
-                console.log(curColumn)
                 curColumn.appendChild(card);
 
                 //над другими элементами
