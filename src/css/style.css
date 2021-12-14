@@ -1,6 +1,7 @@
 .widget {
     display: flex;
     width: 700px;
+    position: relative;
     flex-direction: row;
     border: 1px solid black;
     border-radius: 10px;
@@ -26,6 +27,10 @@
     padding: 5px;
     margin: 5px;
     word-wrap: break-word
+}
+
+.card:hover {
+    border: 2px solid black;
 }
 
 .add {
@@ -74,6 +79,10 @@
 
 .delete {
     background-image: url(../pics/delete.png);
+}
+
+.delete:hover{
+    background-image: url(../pics/delete2.png);
 }
 
 .hidden {
