@@ -89,8 +89,24 @@ export default class Card {
             // перемещение на экране
             document.onmousemove = function (e) {
                 moveAt(e);
-                // let actualCoords = card.getBoundingClientRect();
-                // this.center = actualCoords.left + actualCoords.width / 2;
+
+                let actualCoords = card.getBoundingClientRect();
+                let center = actualCoords.left + actualCoords.width / 2;
+
+                let columns = Array.from(document.getElementsByClassName('column'));
+                let col1 = columns[0].getBoundingClientRect();
+                let col2 = columns[1].getBoundingClientRect();
+                let col3 = columns[2].getBoundingClientRect();
+
+                if (center >= col1.left && center <= col1.right) {
+                    Card.setVerticalPosition(columns[0], card);
+                } else if (center >= col2.left && center <= col2.right) {
+                    Card.setVerticalPosition(columns[1], card);
+                }
+                if (center >= col3.left && center <= col3.right) {
+                    Card.setVerticalPosition(columns[2], card);
+                }
+
             }
 
             // окончание переноса
@@ -123,6 +139,44 @@ export default class Card {
             card.ondragstart = function () {
                 return false;
             };
+        }
+    }
+
+    static setVerticalPosition(column, card) {
+        const cards = Array.from(column.getElementsByClassName('card'));
+        if (cards.length > 1) {
+
+            let actualCoords = card.getBoundingClientRect();
+            console.log(actualCoords)
+            let center = actualCoords.top + actualCoords.height / 2;
+
+            let bot = 0;
+            let top = 0;
+
+            for (let i = 1; i < cards.length; i++) {
+                console.log("----------------------")
+                let currentElem = cards[i];
+                console.log(currentElem)
+                let prevElem = cards[i - 1];
+                console.log(prevElem)
+
+                let curCoords = currentElem.getBoundingClientRect();
+                let prevCoords = prevElem.getBoundingClientRect();
+
+                bot = curCoords.top;
+                top = prevCoords.bottom;
+
+                console.log("t: " + top)
+                console.log("c: " + center)
+                console.log("b: " + bot)
+                console.log("----------------------")
+
+                if (center >= (bot-10) && center <= (top+10)) {
+                    console.log('worked')
+                    prevElem.style.border = '20px solid black';
+                    //prevElem.after(card);
+                }
+            }
         }
     }
 }
