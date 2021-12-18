@@ -1,3 +1,5 @@
 import Card from "./Card";
+import AddingCardWindow from "./modalWindow";
 
-const card = new Card();
+new Card();
+new AddingCardWindow();

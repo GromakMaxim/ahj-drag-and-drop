@@ -66,10 +66,6 @@ export default class Card {
                         const addBtn = document.getElementsByClassName('add')[0];
                         addBtn.before(card);
                         card.style.cssText = '';
-
-                        document.cre
-                        columns[0].a
-
                         console.log('1 column');
                     } else if (center >= col2.left && center <= col2.right) {
                         columns[1].appendChild(card);

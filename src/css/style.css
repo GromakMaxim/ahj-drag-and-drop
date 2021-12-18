@@ -5,7 +5,7 @@
     flex-direction: row;
     border: 1px solid black;
     border-radius: 10px;
-    background-color: rgb(245,245,245);
+    background-color: rgb(245, 245, 245);
 }
 
 .column {
@@ -39,6 +39,11 @@
     margin: 5px;
     color: grey;
     font-weight: 600;
+}
+
+.add:hover {
+    font-weight: bolder;
+    cursor: pointer;
 }
 
 .title {
@@ -86,10 +91,16 @@
     background-image: url(../pics/delete.png);
 }
 
-.delete:hover{
+.delete:hover {
     background-image: url(../pics/delete2.png);
 }
 
 .hidden {
     display: none;
+}
+
+.new-card-content {
+    margin: 0px;
+    width: 509px;
+    height: 151px;
 }
