@@ -1,3 +1,5 @@
+import Card from "./Card";
+
 export default class AddingCardWindow {
 
     constructor() {
@@ -47,6 +49,13 @@ export default class AddingCardWindow {
 
             const addBtn = document.getElementsByClassName('add')[0];
             addBtn.before(card);
+
+            Card.setDragAndDropToCard(card);
+
+            textarea.value = "";
+
+            let dialog = document.getElementById('card-addition');
+            dialog.close();
         })
     }
 }
