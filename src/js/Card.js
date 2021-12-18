@@ -9,11 +9,11 @@ export default class Card {
         this.mouseOut();
     }
 
-    async drag(){
+    async drag() {
         this.cards.forEach(card => {
 
             // отслеживаем нажатие
-            card.onmousedown = function(e) {
+            card.onmousedown = function (e) {
                 let shiftX = e.pageX - getCoords(card).left;
                 let shiftY = e.pageY - getCoords(card).top;
 
@@ -30,8 +30,8 @@ export default class Card {
 
                 // передвинуть мяч под коорд курсора
                 function moveAt(e) {
-                    card.style.left = e.pageX  - shiftX + 'px';
-                    card.style.top = e.pageY  - shiftY + 'px';
+                    card.style.left = e.pageX - shiftX + 'px';
+                    card.style.top = e.pageY - shiftY + 'px';
                 }
 
                 function getCoords(elem) {   // кроме IE8-
@@ -41,37 +41,41 @@ export default class Card {
                         left: box.left - 14
                     };
                 }
-                
+
                 // перемещение на экране
-                document.onmousemove = function(e) {
+                document.onmousemove = function (e) {
                     moveAt(e);
                     let actualCoords = card.getBoundingClientRect();
-                    this.center = actualCoords.left + actualCoords.width/2;
+                    this.center = actualCoords.left + actualCoords.width / 2;
                 }
 
                 // окончание переноса
-                card.onmouseup = function() {
+                card.onmouseup = function () {
                     document.onmousemove = null;
                     card.onmouseup = null;
 
                     let actualCoords = card.getBoundingClientRect();
-                    let center = actualCoords.left + actualCoords.width/2;
+                    let center = actualCoords.left + actualCoords.width / 2;
 
                     let columns = Array.from(document.getElementsByClassName('column'));
                     let col1 = columns[0].getBoundingClientRect();
                     let col2 = columns[1].getBoundingClientRect();
                     let col3 = columns[2].getBoundingClientRect();
 
-                    if (center >=col1.left && center <= col1.right){
-                        columns[0].appendChild(card);
+                    if (center >= col1.left && center <= col1.right) {
+                        const addBtn = document.getElementsByClassName('add')[0];
+                        addBtn.before(card);
                         card.style.cssText = '';
 
+                        document.cre
+                        columns[0].a
+
                         console.log('1 column');
-                    }else if (center >= col2.left && center <= col2.right){
+                    } else if (center >= col2.left && center <= col2.right) {
                         columns[1].appendChild(card);
                         card.style.cssText = '';
                     }
-                    if (center >= col3.left && center <= col3.right){
+                    if (center >= col3.left && center <= col3.right) {
                         columns[2].appendChild(card);
                         card.style.cssText = '';
 
@@ -81,7 +85,7 @@ export default class Card {
 
                 }
 
-                card.ondragstart = function() {
+                card.ondragstart = function () {
                     return false;
                 };
             }
@@ -90,9 +94,9 @@ export default class Card {
 
     mouseOver() {
         this.cards.forEach(card => {
-            card.addEventListener("mouseover", (event)=> {
+            card.addEventListener("mouseover", (event) => {
                 event.preventDefault();
-                if (card.childNodes.length > 1){
+                if (card.childNodes.length > 1) {
                     card.children[0].children[1].classList.remove('hidden');
                 }
             });
@@ -101,10 +105,10 @@ export default class Card {
 
     mouseOut() {
         this.cards.forEach(card => {
-            card.addEventListener("mouseout", (event)=> {
+            card.addEventListener("mouseout", (event) => {
                 event.preventDefault();
-                
-                if (card.childNodes.length > 1){
+
+                if (card.childNodes.length > 1) {
                     const cl = card.children[0].children[1];
                     if (!cl.classList.contains('hidden')) {
                         cl.classList.add('hidden');
