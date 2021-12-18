@@ -114,6 +114,9 @@ export default class Card {
                 document.onmousemove = null;
                 card.onmouseup = null;
 
+                let allCards = Array.from(document.getElementsByClassName('card'));
+                allCards.forEach((card)=> card.style.marginBottom = "");
+
                 let actualCoords = card.getBoundingClientRect();
                 let center = actualCoords.left + actualCoords.width / 2;
 
@@ -152,13 +155,12 @@ export default class Card {
 
             let bot = 0;
             let top = 0;
+            cards.forEach((card) => card.style.marginBottom = "");
 
             for (let i = 1; i < cards.length; i++) {
-                console.log("----------------------")
+
                 let currentElem = cards[i];
-                console.log(currentElem)
                 let prevElem = cards[i - 1];
-                console.log(prevElem)
 
                 let curCoords = currentElem.getBoundingClientRect();
                 let prevCoords = prevElem.getBoundingClientRect();
@@ -166,14 +168,8 @@ export default class Card {
                 bot = curCoords.top;
                 top = prevCoords.bottom;
 
-                console.log("t: " + top)
-                console.log("c: " + center)
-                console.log("b: " + bot)
-                console.log("----------------------")
-
-                if (center >= (bot-10) && center <= (top+10)) {
-                    console.log('worked')
-                    prevElem.style.border = '20px solid black';
+                if (center >= (bot - 20) && center <= (top + 20)) {
+                    prevElem.style.marginBottom = actualCoords.height + "px";
                     //prevElem.after(card);
                 }
             }
