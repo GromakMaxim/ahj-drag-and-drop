@@ -111,8 +111,7 @@ export default class Card {
 
                 let allCards = Array.from(document.getElementsByClassName('card'));
                 allCards.forEach((item) => {
-                    item.style.marginBottom = "";
-                    item.style.marginTop = "";
+                    Card.offBorders(item);
                 });
 
                 allCards.forEach((item) => {
@@ -143,26 +142,21 @@ export default class Card {
         // ищем ближайшую
         let index;
 
-        let diffX = 99_999;
-        let diffY = 99_999;
+        let diff = 99_999;
 
         for (let i = 0; i < cards.length; i++) {
             if (cards[i].id !== card.id) {
                 cards[i].getBoundingClientRect();
                 const curCardCenter = this.getCenter(cards[i]);
 
-                if (Math.abs(center.x - curCardCenter.x) <= diffX &&
-                    Math.abs(center.y - curCardCenter.y) <= diffY) {
+                if (Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y)) <= diff) {
 
-                    diffX = Math.abs(center.x - curCardCenter.x);
-                    diffY = Math.abs(center.y - curCardCenter.y);
-
+                    diff = Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y));
                     index = i;
                 }
             }
         }
 
-        console.log()
         showCoords.textContent = JSON.stringify(center);
         showNumber.textContent = index;
         showClosestCoords.textContent = JSON.stringify(cards[index].getBoundingClientRect());
@@ -171,10 +165,10 @@ export default class Card {
 
         if (center.y <= closestCardCenter.y && center.y <= closestCardCenter.y) {
             cards[index].classList.add('insert-before');
-            cards[index].style.marginTop = card.getBoundingClientRect().height + "px";
+            Card.onBorders(cards[index], card.getBoundingClientRect().height, "top");
         } else if (center.y >= closestCardCenter.y && center.y >= closestCardCenter.y) {
             cards[index].classList.add('insert-after');
-            cards[index].style.marginBottom = card.getBoundingClientRect().height + "px";
+            Card.onBorders(cards[index], card.getBoundingClientRect().height, "bot");
         }
     }
 
@@ -185,7 +179,30 @@ export default class Card {
             x: rect.left + rect.width / 2,
             y: rect.top + rect.height / 2,
         };
+    }
 
+    static offBorders(block) {
+        block.style.borderTopWidth = "";
+        block.style.borderTopStyle = "";
+        block.style.borderTopColor = "";
+
+        block.style.borderBottomWidth = "";
+        block.style.borderBottomStyle = "";
+        block.style.borderBottomColor = "";
+    }
+
+    static onBorders(block, px, side) {
+        if (side === 'top') {
+            block.style.borderTopWidth = px + "px"; /* Толщина линии внизу */
+            block.style.borderTopStyle = 'solid';
+            block.style.borderTopColor = 'grey';
+        } else if (side === 'bot') {
+            block.style.borderBottomWidth = px + "px"; /* Толщина линии внизу */
+            block.style.borderBottomStyle = 'solid';
+            block.style.borderBottomColor = 'grey';
+        } else {
+            throw new Error('idn what to do!')
+        }
     }
 
     static cleanUp() {
@@ -193,8 +210,8 @@ export default class Card {
         cards.forEach((item) => {
             item.classList.remove('insert-after');
             item.classList.remove('insert-before');
-            item.style.marginBottom = "";
-            item.style.marginTop = "";
+            item.style.zIndex = "";
+            Card.offBorders(item);
         })
     }
 }
