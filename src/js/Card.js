@@ -2,6 +2,7 @@ export default class Card {
     // center = 0;
 
     constructor() {
+        this.setIds();
         this.cards = Array.from(document.getElementsByClassName('card'));
         // this.columns = Array.from(document.getElementsByClassName('column'));
         this.dragAllCards();
@@ -13,6 +14,17 @@ export default class Card {
         Card.dragCard(card);
         Card.mouseOut(card);
         Card.mouserOver(card);
+    }
+
+    setIds() {
+        const columns = Array.from(document.getElementsByClassName('column'));
+        for (let i = 0; i < columns.length; i++) {
+            const cardsInColumn = columns[i].getElementsByClassName('card');
+
+            for (let j = 0; j < cardsInColumn.length; j++) {
+                cardsInColumn[j].id = i + "-" + j;
+            }
+        }
     }
 
     dragAllCards() {
@@ -66,9 +78,6 @@ export default class Card {
             card.style.position = 'absolute';
             moveAt(e);
 
-            let curColumn = card.parentNode;
-            curColumn.appendChild(card);
-
             //над другими элементами
             card.style.zIndex = 1000;
 
@@ -87,26 +96,12 @@ export default class Card {
             }
 
             // перемещение на экране
-            document.onmousemove = function (e) {
+            document.onmousemove = async function (e) {
                 moveAt(e);
 
-                let actualCoords = card.getBoundingClientRect();
-                let center = actualCoords.left + actualCoords.width / 2;
+                await Card.cleanUp();
 
-                let columns = Array.from(document.getElementsByClassName('column'));
-                let col1 = columns[0].getBoundingClientRect();
-                let col2 = columns[1].getBoundingClientRect();
-                let col3 = columns[2].getBoundingClientRect();
-
-                if (center >= col1.left && center <= col1.right) {
-                    Card.setVerticalPosition(columns[0], card);
-                } else if (center >= col2.left && center <= col2.right) {
-                    Card.setVerticalPosition(columns[1], card);
-                }
-                if (center >= col3.left && center <= col3.right) {
-                    Card.setVerticalPosition(columns[2], card);
-                }
-
+                await Card.findClosest(card);
             }
 
             // окончание переноса
@@ -115,28 +110,19 @@ export default class Card {
                 card.onmouseup = null;
 
                 let allCards = Array.from(document.getElementsByClassName('card'));
-                allCards.forEach((card)=> card.style.marginBottom = "");
+                allCards.forEach((item) => {
+                    item.style.marginBottom = "";
+                    item.style.marginTop = "";
+                });
 
-                let actualCoords = card.getBoundingClientRect();
-                let center = actualCoords.left + actualCoords.width / 2;
-
-                let columns = Array.from(document.getElementsByClassName('column'));
-                let col1 = columns[0].getBoundingClientRect();
-                let col2 = columns[1].getBoundingClientRect();
-                let col3 = columns[2].getBoundingClientRect();
-
-                if (center >= col1.left && center <= col1.right) {
-                    const addBtn = document.getElementsByClassName('add')[0];
-                    addBtn.before(card);
-                    card.style.cssText = '';
-                } else if (center >= col2.left && center <= col2.right) {
-                    columns[1].appendChild(card);
-                    card.style.cssText = '';
-                }
-                if (center >= col3.left && center <= col3.right) {
-                    columns[2].appendChild(card);
-                    card.style.cssText = '';
-                }
+                allCards.forEach((item) => {
+                    if (item.classList.contains('insert-before')) {
+                        item.before(card);
+                    } else if (item.classList.contains('insert-after')) {
+                        item.after(card);
+                    }
+                    item.style.position = "";
+                })
             }
 
             card.ondragstart = function () {
@@ -145,34 +131,70 @@ export default class Card {
         }
     }
 
-    static setVerticalPosition(column, card) {
-        const cards = Array.from(column.getElementsByClassName('card'));
-        if (cards.length > 1) {
+    static async findClosest(card) {
+        const center = Card.getCenter(card);
+        const cards = Array.from(document.getElementsByClassName('card'));
+        await Card.cleanUp();
 
-            let actualCoords = card.getBoundingClientRect();
-            console.log(actualCoords)
-            let center = actualCoords.top + actualCoords.height / 2;
+        const showCoords = document.getElementById('curcoords');
+        const showNumber = document.getElementById('closest-card-number');
+        const showClosestCoords = document.getElementById('closest-card-coords');
 
-            let bot = 0;
-            let top = 0;
-            cards.forEach((card) => card.style.marginBottom = "");
+        // ищем ближайшую
+        let index;
 
-            for (let i = 1; i < cards.length; i++) {
+        let diffX = 99_999;
+        let diffY = 99_999;
 
-                let currentElem = cards[i];
-                let prevElem = cards[i - 1];
+        for (let i = 0; i < cards.length; i++) {
+            if (cards[i].id !== card.id) {
+                cards[i].getBoundingClientRect();
+                const curCardCenter = this.getCenter(cards[i]);
 
-                let curCoords = currentElem.getBoundingClientRect();
-                let prevCoords = prevElem.getBoundingClientRect();
+                if (Math.abs(center.x - curCardCenter.x) <= diffX &&
+                    Math.abs(center.y - curCardCenter.y) <= diffY) {
 
-                bot = curCoords.top;
-                top = prevCoords.bottom;
+                    diffX = Math.abs(center.x - curCardCenter.x);
+                    diffY = Math.abs(center.y - curCardCenter.y);
 
-                if (center >= (bot - 20) && center <= (top + 20)) {
-                    prevElem.style.marginBottom = actualCoords.height + "px";
-                    //prevElem.after(card);
+                    index = i;
                 }
             }
         }
+
+        console.log()
+        showCoords.textContent = JSON.stringify(center);
+        showNumber.textContent = index;
+        showClosestCoords.textContent = JSON.stringify(cards[index].getBoundingClientRect());
+
+        const closestCardCenter = this.getCenter(cards[index]);
+
+        if (center.y <= closestCardCenter.y && center.y <= closestCardCenter.y) {
+            cards[index].classList.add('insert-before');
+            cards[index].style.marginTop = card.getBoundingClientRect().height + "px";
+        } else if (center.y >= closestCardCenter.y && center.y >= closestCardCenter.y) {
+            cards[index].classList.add('insert-after');
+            cards[index].style.marginBottom = card.getBoundingClientRect().height + "px";
+        }
+    }
+
+    static getCenter(block) {
+        const rect = block.getBoundingClientRect();
+        // x — абсцисса, y — ордината центра
+        return {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+        };
+
+    }
+
+    static cleanUp() {
+        const cards = Array.from(document.getElementsByClassName('card'));
+        cards.forEach((item) => {
+            item.classList.remove('insert-after');
+            item.classList.remove('insert-before');
+            item.style.marginBottom = "";
+            item.style.marginTop = "";
+        })
     }
 }
