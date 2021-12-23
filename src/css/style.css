@@ -83,8 +83,16 @@
     background-image: url(../pics/like.png);
 }
 
+.like:hover {
+    background-image: url(../pics/like2.png);
+}
+
 .comment {
     background-image: url(../pics/comment.png);
+}
+
+.comment:hover {
+    background-image: url(../pics/comment2.png);
 }
 
 .delete {
