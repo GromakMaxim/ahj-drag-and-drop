@@ -47,7 +47,7 @@ export default class AddingCardWindow {
 
             card.append(buttons);
 
-            const addBtn = document.getElementsByClassName('add')[0];
+            const addBtn = document.getElementsByClassName('todo')[0].lastChild;
             addBtn.before(card);
 
             Card.setDragAndDropToCard(card);

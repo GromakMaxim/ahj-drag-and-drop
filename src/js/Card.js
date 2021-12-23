@@ -114,14 +114,25 @@ export default class Card {
                     Card.offBorders(item);
                 });
 
-                allCards.forEach((item) => {
-                    if (item.classList.contains('insert-before')) {
-                        item.before(card);
-                    } else if (item.classList.contains('insert-after')) {
-                        item.after(card);
-                    }
-                    item.style.position = "";
-                })
+                // сначала ищем колонку для вставки
+                const columnToInsert = document.getElementsByClassName('insert-inside')[0];
+
+                if (columnToInsert !== null && columnToInsert !== undefined) {
+                    columnToInsert.getElementsByClassName('title')[0].after(card);
+                    card.style.position = "";
+                    columnToInsert.classList.remove('insert-inside');
+                } else {
+                    allCards.forEach((item) => {
+                        if (item.classList.contains('insert-before')) {
+                            item.before(card);
+                        } else if (item.classList.contains('insert-after')) {
+                            item.after(card);
+                        }
+                        item.style.position = "";
+                    })
+                }
+
+
             }
 
             card.ondragstart = function () {
@@ -133,42 +144,61 @@ export default class Card {
     static async findClosest(card) {
         const center = Card.getCenter(card);
         const cards = Array.from(document.getElementsByClassName('card'));
+        const allColumns = Array.from(document.getElementsByClassName('column'));
+        const emptyColumns = allColumns.filter((column) => column.children.length === 1);
+
         await Card.cleanUp();
+        let insertInColumn = false;
 
-        const showCoords = document.getElementById('curcoords');
-        const showNumber = document.getElementById('closest-card-number');
-        const showClosestCoords = document.getElementById('closest-card-coords');
+        for (let i = 0; i < emptyColumns.length; i++) {
+            const curCoords = emptyColumns[i].getBoundingClientRect();
+            const showEmpty = document.getElementById('empty-col');
+            showEmpty.textContent = JSON.stringify(curCoords);
 
-        // ищем ближайшую
-        let index;
-
-        let diff = 99_999;
-
-        for (let i = 0; i < cards.length; i++) {
-            if (cards[i].id !== card.id) {
-                cards[i].getBoundingClientRect();
-                const curCardCenter = this.getCenter(cards[i]);
-
-                if (Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y)) <= diff) {
-
-                    diff = Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y));
-                    index = i;
+            if (center.x >= curCoords.left && center.x <= curCoords.right) {
+                if (center.y <= curCoords.bottom && center.y >= curCoords.top) {
+                    emptyColumns[i].classList.add('insert-inside');
+                    insertInColumn = true;
                 }
             }
         }
 
-        showCoords.textContent = JSON.stringify(center);
-        showNumber.textContent = index;
-        showClosestCoords.textContent = JSON.stringify(cards[index].getBoundingClientRect());
+        if (!insertInColumn) {
+            const showCoords = document.getElementById('curcoords');
+            const showNumber = document.getElementById('closest-card-number');
+            const showClosestCoords = document.getElementById('closest-card-coords');
 
-        const closestCardCenter = this.getCenter(cards[index]);
+            // ищем ближайшую
+            let index;
 
-        if (center.y <= closestCardCenter.y && center.y <= closestCardCenter.y) {
-            cards[index].classList.add('insert-before');
-            Card.onBorders(cards[index], card.getBoundingClientRect().height, "top");
-        } else if (center.y >= closestCardCenter.y && center.y >= closestCardCenter.y) {
-            cards[index].classList.add('insert-after');
-            Card.onBorders(cards[index], card.getBoundingClientRect().height, "bot");
+            let diff = 99_999;
+
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].id !== card.id) {
+                    cards[i].getBoundingClientRect();
+                    const curCardCenter = this.getCenter(cards[i]);
+
+                    if (Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y)) <= diff) {
+
+                        diff = Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y));
+                        index = i;
+                    }
+                }
+            }
+
+            showCoords.textContent = JSON.stringify(center);
+            showNumber.textContent = index;
+            showClosestCoords.textContent = JSON.stringify(cards[index].getBoundingClientRect());
+
+            const closestCardCenter = this.getCenter(cards[index]);
+
+            if (center.y <= closestCardCenter.y && center.y <= closestCardCenter.y) {
+                cards[index].classList.add('insert-before');
+                Card.onBorders(cards[index], card.getBoundingClientRect().height, "top");
+            } else if (center.y >= closestCardCenter.y && center.y >= closestCardCenter.y) {
+                cards[index].classList.add('insert-after');
+                Card.onBorders(cards[index], card.getBoundingClientRect().height, "bot");
+            }
         }
     }
 
@@ -213,5 +243,10 @@ export default class Card {
             item.style.zIndex = "";
             Card.offBorders(item);
         })
+
+        const columns = Array.from(document.getElementsByClassName('column'));
+        columns.forEach((col) => {
+            col.classList.remove('insert-inside');
+        });
     }
 }
