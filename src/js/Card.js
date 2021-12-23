@@ -15,41 +15,12 @@ export default class Card {
         Card.mouserOver(card);
     }
 
-    setIds() {
-        const columns = Array.from(document.getElementsByClassName('column'));
-        for (let i = 0; i < columns.length; i++) {
-            const cardsInColumn = columns[i].getElementsByClassName('card');
-
-            for (let j = 0; j < cardsInColumn.length; j++) {
-                cardsInColumn[j].id = i + "-" + j;
-            }
-        }
-    }
-
-    dragAllCards() {
-        this.cards.forEach(card => {
-            Card.dragCard(card);
-        });
-    }
-
-    mouseOverAllCards() {
-        this.cards.forEach(card => {
-            Card.mouserOver(card);
-        });
-    }
-
     static mouserOver(card) {
         card.addEventListener("mouseover", (event) => {
             event.preventDefault();
             if (card.childNodes.length > 1) {
                 card.children[0].children[1].classList.remove('hidden');
             }
-        });
-    }
-
-    mouseOutAllCards() {
-        this.cards.forEach(card => {
-            Card.mouseOut(card);
         });
     }
 
@@ -251,6 +222,35 @@ export default class Card {
         btn.addEventListener('click', (event) => {
             event.preventDefault();
             btn.parentElement.parentElement.remove();
+        });
+    }
+
+    setIds() {
+        const columns = Array.from(document.getElementsByClassName('column'));
+        for (let i = 0; i < columns.length; i++) {
+            const cardsInColumn = columns[i].getElementsByClassName('card');
+
+            for (let j = 0; j < cardsInColumn.length; j++) {
+                cardsInColumn[j].id = i + "-" + j;
+            }
+        }
+    }
+
+    dragAllCards() {
+        this.cards.forEach(card => {
+            Card.dragCard(card);
+        });
+    }
+
+    mouseOverAllCards() {
+        this.cards.forEach(card => {
+            Card.mouserOver(card);
+        });
+    }
+
+    mouseOutAllCards() {
+        this.cards.forEach(card => {
+            Card.mouseOut(card);
         });
     }
 
