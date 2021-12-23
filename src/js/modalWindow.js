@@ -35,6 +35,7 @@ export default class AddingCardWindow {
             const del = document.createElement('div');
             del.classList.add('delete');
             del.classList.add('hidden');
+            Card.deleteCard(del);
 
             const comment = document.createElement('div');
             comment.className = "comment";

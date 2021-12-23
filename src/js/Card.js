@@ -1,13 +1,12 @@
 export default class Card {
-    // center = 0;
 
     constructor() {
         this.setIds();
         this.cards = Array.from(document.getElementsByClassName('card'));
-        // this.columns = Array.from(document.getElementsByClassName('column'));
         this.dragAllCards();
         this.mouseOverAllCards();
         this.mouseOutAllCards();
+        this.setDeleteButtons();
     }
 
     static setDragAndDropToCard(card) {
@@ -131,8 +130,6 @@ export default class Card {
                         item.style.position = "";
                     })
                 }
-
-
             }
 
             card.ondragstart = function () {
@@ -247,6 +244,23 @@ export default class Card {
         const columns = Array.from(document.getElementsByClassName('column'));
         columns.forEach((col) => {
             col.classList.remove('insert-inside');
+        });
+    }
+
+    static deleteCard(btn) {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            btn.parentElement.parentElement.remove();
+        });
+    }
+
+    setDeleteButtons() {
+        const delBtns = Array.from(document.getElementsByClassName('delete'));
+        delBtns.forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                btn.parentElement.parentElement.remove();
+            });
         });
     }
 }
