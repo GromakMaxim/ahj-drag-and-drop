@@ -29,9 +29,12 @@
     word-wrap: break-word
 }
 
-.card:hover {
-    border: 2px solid black;
+.card-title:hover {
     cursor: grabbing;
+}
+
+.card-title {
+    display: block;
 }
 
 .add {

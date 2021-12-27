@@ -35,7 +35,7 @@ export default class AddingCardWindow {
             const del = document.createElement('div');
             del.classList.add('delete');
             del.classList.add('hidden');
-            Card.deleteCard(del);
+            Card.setDelete(del);
 
             const comment = document.createElement('div');
             comment.className = "comment";
@@ -57,6 +57,7 @@ export default class AddingCardWindow {
 
             let dialog = document.getElementById('card-addition');
             dialog.close();
+            Card.calculateIds();
         })
     }
 }

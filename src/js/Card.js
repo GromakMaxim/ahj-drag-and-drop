@@ -1,9 +1,12 @@
+import {mouseOut, mouseOver} from "./MouseHandler.js";
+import {getCenter, getCoords} from "./CoordinatesService";
+
 export default class Card {
 
     constructor() {
-        this.setIds();
+        Card.calculateIds();
         this.cards = Array.from(document.getElementsByClassName('card'));
-        this.dragAllCards();
+        this.setDragToAllCards();
         this.mouseOverAllCards();
         this.mouseOutAllCards();
         this.setDeleteButtons();
@@ -11,35 +14,25 @@ export default class Card {
 
     static setDragAndDropToCard(card) {
         Card.dragCard(card);
-        Card.mouseOut(card);
-        Card.mouserOver(card);
+        mouseOut(card);
+        mouseOver(card);
     }
 
-    static mouserOver(card) {
-        card.addEventListener("mouseover", (event) => {
-            event.preventDefault();
-            if (card.childNodes.length > 1) {
-                card.children[0].children[1].classList.remove('hidden');
-            }
-        });
-    }
+    static calculateIds() {
+        const columns = Array.from(document.getElementsByClassName('column'));
+        for (let i = 0; i < columns.length; i++) {
+            const cardsInColumn = columns[i].getElementsByClassName('card');
 
-    static mouseOut(card) {
-        card.addEventListener("mouseout", (event) => {
-            event.preventDefault();
-
-            if (card.childNodes.length > 1) {
-                const cl = card.children[0].children[1];
-                if (!cl.classList.contains('hidden')) {
-                    cl.classList.add('hidden');
-                }
+            for (let j = 0; j < cardsInColumn.length; j++) {
+                cardsInColumn[j].id = i + "-" + j;
             }
-        });
+        }
     }
 
     static dragCard(card) {
+        const titleDnd = card.getElementsByClassName('card-title')[0];
         // отслеживаем нажатие
-        card.onmousedown = function (e) {
+        titleDnd.onmousedown = function (e) {
             let shiftX = e.pageX - getCoords(card).left;
             let shiftY = e.pageY - getCoords(card).top;
 
@@ -49,20 +42,12 @@ export default class Card {
             moveAt(e);
 
             //над другими элементами
-            card.style.zIndex = 1000;
+            card.style.zIndex = '1_000';
 
             // передвинуть мяч под коорд курсора
             function moveAt(e) {
                 card.style.left = e.pageX - shiftX + 'px';
                 card.style.top = e.pageY - shiftY + 'px';
-            }
-
-            function getCoords(elem) {   // кроме IE8-
-                let box = elem.getBoundingClientRect();
-                return {
-                    top: box.top - 14,
-                    left: box.left - 14
-                };
             }
 
             // перемещение на экране
@@ -75,9 +60,9 @@ export default class Card {
             }
 
             // окончание переноса
-            card.onmouseup = function () {
+            titleDnd.onmouseup = async function () {
                 document.onmousemove = null;
-                card.onmouseup = null;
+                titleDnd.onmouseup = null;
 
                 let allCards = Array.from(document.getElementsByClassName('card'));
                 allCards.forEach((item) => {
@@ -91,6 +76,7 @@ export default class Card {
                     columnToInsert.getElementsByClassName('title')[0].after(card);
                     card.style.position = "";
                     columnToInsert.classList.remove('insert-inside');
+                    // Card.cleanUp();
                 } else {
                     allCards.forEach((item) => {
                         if (item.classList.contains('insert-before')) {
@@ -99,8 +85,11 @@ export default class Card {
                             item.after(card);
                         }
                         item.style.position = "";
+                        // Card.cleanUp();
                     })
                 }
+                await Card.calculateIds();
+
             }
 
             card.ondragstart = function () {
@@ -110,7 +99,7 @@ export default class Card {
     }
 
     static async findClosest(card) {
-        const center = Card.getCenter(card);
+        const center = getCenter(card);
         const cards = Array.from(document.getElementsByClassName('card'));
         const allColumns = Array.from(document.getElementsByClassName('column'));
         const emptyColumns = allColumns.filter((column) => column.children.length === 1);
@@ -144,7 +133,7 @@ export default class Card {
             for (let i = 0; i < cards.length; i++) {
                 if (cards[i].id !== card.id) {
                     cards[i].getBoundingClientRect();
-                    const curCardCenter = this.getCenter(cards[i]);
+                    const curCardCenter = getCenter(cards[i]);
 
                     if (Math.abs(Math.abs(center.x - curCardCenter.x) - Math.abs(center.y - curCardCenter.y)) <= diff) {
 
@@ -158,7 +147,7 @@ export default class Card {
             showNumber.textContent = index;
             showClosestCoords.textContent = JSON.stringify(cards[index].getBoundingClientRect());
 
-            const closestCardCenter = this.getCenter(cards[index]);
+            const closestCardCenter = getCenter(cards[index]);
 
             if (center.y <= closestCardCenter.y && center.y <= closestCardCenter.y) {
                 cards[index].classList.add('insert-before');
@@ -167,16 +156,8 @@ export default class Card {
                 cards[index].classList.add('insert-after');
                 Card.onBorders(cards[index], card.getBoundingClientRect().height, "bot");
             }
-        }
-    }
 
-    static getCenter(block) {
-        const rect = block.getBoundingClientRect();
-        // x — абсцисса, y — ордината центра
-        return {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2,
-        };
+        }
     }
 
     static offBorders(block) {
@@ -218,25 +199,14 @@ export default class Card {
         });
     }
 
-    static deleteCard(btn) {
+    static setDelete(btn) {
         btn.addEventListener('click', (event) => {
             event.preventDefault();
             btn.parentElement.parentElement.remove();
         });
     }
 
-    setIds() {
-        const columns = Array.from(document.getElementsByClassName('column'));
-        for (let i = 0; i < columns.length; i++) {
-            const cardsInColumn = columns[i].getElementsByClassName('card');
-
-            for (let j = 0; j < cardsInColumn.length; j++) {
-                cardsInColumn[j].id = i + "-" + j;
-            }
-        }
-    }
-
-    dragAllCards() {
+    setDragToAllCards() {
         this.cards.forEach(card => {
             Card.dragCard(card);
         });
@@ -244,13 +214,13 @@ export default class Card {
 
     mouseOverAllCards() {
         this.cards.forEach(card => {
-            Card.mouserOver(card);
+            mouseOver(card);
         });
     }
 
     mouseOutAllCards() {
         this.cards.forEach(card => {
-            Card.mouseOut(card);
+            mouseOut(card);
         });
     }
 
