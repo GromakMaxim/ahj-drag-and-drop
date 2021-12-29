@@ -102,7 +102,7 @@ export default class Card {
         const center = getCenter(card);
         const cards = Array.from(document.getElementsByClassName('card'));
         const allColumns = Array.from(document.getElementsByClassName('column'));
-        const emptyColumns = allColumns.filter((column) => column.children.length === 1);
+        const emptyColumns = allColumns.filter((column) => column.children.length === 2);
 
         await Card.cleanUp();
         let insertInColumn = false;

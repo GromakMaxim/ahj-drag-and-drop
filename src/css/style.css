@@ -19,6 +19,12 @@
     border-left: 1px solid black;
 }
 
+.add-panel {
+    display: flex;
+    flex-direction: row;
+    width: 700px;
+}
+
 .card {
     width: 220px;
     border: 1px solid black;

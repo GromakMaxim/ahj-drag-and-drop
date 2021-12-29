@@ -10,9 +10,15 @@ export default class AddingCardWindow {
 
     showWindow() {
         let dialog = document.getElementById('card-addition');
-        document.getElementById('show').onclick = function () {
-            dialog.show();
-        };
+        const addBtns = Array.from(document.getElementsByClassName('add'));
+        addBtns.forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                btn.id = 'new-card-insert-here';
+                dialog.show();
+            });
+        })
+
         document.getElementById('exit').onclick = function () {
             dialog.close();
         };
@@ -27,7 +33,11 @@ export default class AddingCardWindow {
 
             const card = document.createElement('div');
             card.className = "card";
-            card.textContent = textarea.value;
+
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            title.textContent = textarea.value;
+            card.append(title);
 
             const like = document.createElement('div');
             like.className = "like";
@@ -48,8 +58,9 @@ export default class AddingCardWindow {
 
             card.append(buttons);
 
-            const addBtn = document.getElementsByClassName('todo')[0].lastChild;
-            addBtn.before(card);
+            const target = document.getElementById('new-card-insert-here');
+            target.before(card);
+            target.id = '';
 
             Card.setDragAndDropToCard(card);
 
